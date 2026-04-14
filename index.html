@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital LIMS - XP Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Classic Windows Font */
+        body { font-family: Tahoma, 'Trebuchet MS', 'Segoe UI', sans-serif; }
+        
+        /* Classic Windows Scrollbar */
+        ::-webkit-scrollbar { width: 16px; height: 16px; }
+        ::-webkit-scrollbar-track { background: #F0F0F0; border-left: 1px solid #E3E3E3; }
+        ::-webkit-scrollbar-thumb { background: #CDCDCD; border: 1px outset #FFFFFF; }
+        ::-webkit-scrollbar-thumb:hover { background: #A6A6A6; }
+        ::-webkit-scrollbar-button:single-button { background-color: #CDCDCD; display: block; border: 1px outset #FFF; height: 16px; width: 16px; }
+        
+        /* XP UI Elements */
+        .xp-bg { background-color: #ECE9D8; }
+        
+        .xp-titlebar {
+            background: linear-gradient(to right, #0058E6 0%, #3A93FF 100%);
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+        
+        .xp-title-text {
+            color: #FFFFFF;
+            text-shadow: 1px 1px 2px #0A246A;
+            font-weight: bold;
+        }
+        
+        .xp-window-btn {
+            background: linear-gradient(180deg, #F2F2F2 0%, #EBEBEB 45%, #DDDDDD 55%, #CFCFCF 100%);
+            border: 1px solid #FFF;
+            border-radius: 3px;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .xp-close-btn {
+            background: linear-gradient(180deg, #E56A5B 0%, #D84234 45%, #C22718 55%, #C42C1D 100%);
+            border: 1px solid #FFF;
+            border-radius: 3px;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            color: #FFF;
+            font-weight: bold;
+        }
+        
+        .xp-close-btn:active { background: #B02315; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5); }
+        .xp-window-btn:active { background: #BDBDBD; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.5); }
+        
+        /* Classic Menu & Dropdown */
+        .xp-menu-bar { border-bottom: 1px solid #ACA899; }
+        .dropdown-menu { display: none; }
+        .dropdown-parent:hover .dropdown-menu { display: block; }
+        .xp-dropdown {
+            background: #FFFFFF;
+            border: 1px solid #ACA899;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        }
+        .xp-menu-item:hover { background-color: #316AC5; color: #FFFFFF; }
+        
+        /* Toolbars and Inputs */
+        .xp-toolbar { border-bottom: 1px solid #ACA899; border-top: 1px solid #FFFFFF; }
+        .xp-input {
+            border-top: 2px solid #ACA899;
+            border-left: 2px solid #ACA899;
+            border-bottom: 1px solid #E6E6E6;
+            border-right: 1px solid #E6E6E6;
+            background: #FFFFFF;
+        }
+        
+        .xp-btn {
+            background: linear-gradient(180deg, #F2F2F2 0%, #EBEBEB 45%, #DDDDDD 55%, #CFCFCF 100%);
+            border: 1px solid #707070;
+            border-radius: 3px;
+            color: #000;
+        }
+        .xp-btn:active { background: #CCCCCC; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.4); }
+        
+        /* Fieldsets and Tables */
+        .xp-fieldset { border: 1px solid #D5D5D0; border-radius: 4px; }
+        .xp-legend { color: #0033CC; }
+        
+        .xp-th {
+            background: #ECE9D8;
+            border-top: 1px solid #FFFFFF;
+            border-left: 1px solid #FFFFFF;
+            border-bottom: 1px solid #ACA899;
+            border-right: 1px solid #ACA899;
+        }
+        
+        .xp-tr-hover:hover { background-color: #316AC5; color: #FFFFFF; }
+        .xp-tr-hover:hover td { color: #FFFFFF; border-color: #316AC5; }
+        .xp-tr-hover:hover span { color: #FFFFFF !important; border-color: #FFFFFF !important; }
+        
+        /* Status Bar */
+        .xp-statusbar { border-top: 1px solid #ACA899; }
+        .xp-status-pane {
+            border-top: 1px solid #ACA899;
+            border-left: 1px solid #ACA899;
+            border-bottom: 1px solid #FFFFFF;
+            border-right: 1px solid #FFFFFF;
+        }
+    </style>
+</head>
+<body class="bg-[#2A5DB0] h-screen p-4 flex flex-col items-center justify-center text-[11px] text-black overflow-hidden select-none">
+
+    <!-- Application Window Container -->
+    <div class="w-full max-w-7xl h-full max-h-[900px] flex flex-col xp-bg rounded-t-[8px] rounded-b-sm shadow-[0_10px_30px_rgba(0,0,0,0.5)] border-2 border-[#0055E5] overflow-hidden ring-1 ring-[#0055E5] ring-offset-1 ring-offset-[#2A5DB0]">
+        
+        <!-- Windows XP Title Bar -->
+        <div class="xp-titlebar h-8 flex items-center justify-between px-1.5 shrink-0 select-none cursor-default">
+            <div class="flex items-center gap-1.5 xp-title-text text-[13px] tracking-wide">
+                <div class="w-4 h-4 bg-white text-[#0055E5] font-bold flex items-center justify-center text-[10px] shadow-sm">M</div>
+                MEDILIMS PRO 2026 - System Administration
+            </div>
+            <div class="flex gap-[2px]">
+                <button class="xp-window-btn w-6 h-6 flex items-center justify-center pb-2 text-sm leading-none focus:outline-none">_</button>
+                <button class="xp-window-btn w-6 h-6 flex items-center justify-center text-xs leading-none focus:outline-none">□</button>
+                <button class="xp-close-btn w-6 h-6 flex items-center justify-center text-xs leading-none focus:outline-none">X</button>
+            </div>
+        </div>
+
+        <!-- Standard Menu Bar -->
+        <div class="xp-menu-bar flex text-[11px] px-1 relative z-50 shrink-0 bg-[#ECE9D8]">
+            <div class="px-2 py-1 hover:bg-[#316AC5] hover:text-white cursor-pointer rounded-sm" onclick="switchView('view-dashboard')">Dashboard</div>
+            
+            <div class="dropdown-parent relative px-2 py-1 hover:bg-[#316AC5] hover:text-white cursor-pointer rounded-sm">
+                Patient
+                <div class="dropdown-menu absolute left-0 top-[100%] xp-dropdown min-w-[150px] text-black py-0.5 mt-[1px]">
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-create-patient')">Create Patient</div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-patient-list')">Patient List</div>
+                    <div class="h-px bg-[#ACA899] mx-1 my-0.5 border-b border-white"></div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-category')">Category</div>
+                </div>
+            </div>
+
+            <div class="dropdown-parent relative px-2 py-1 hover:bg-[#316AC5] hover:text-white cursor-pointer rounded-sm">
+                Tests
+                <div class="dropdown-menu absolute left-0 top-[100%] xp-dropdown min-w-[150px] text-black py-0.5 mt-[1px]">
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-create-test')">Create New Test</div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-tests-list')">Tests List</div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-add-tests')">Add Tests</div>
+                </div>
+            </div>
+
+            <div class="dropdown-parent relative px-2 py-1 hover:bg-[#316AC5] hover:text-white cursor-pointer rounded-sm">
+                Employee
+                <div class="dropdown-menu absolute left-0 top-[100%] xp-dropdown min-w-[150px] text-black py-0.5 mt-[1px]">
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-employee-list')">List</div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-create-employee')">Create</div>
+                    <div class="h-px bg-[#ACA899] mx-1 my-0.5 border-b border-white"></div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-department')">Department</div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-designation')">Designation</div>
+                </div>
+            </div>
+
+            <div class="dropdown-parent relative px-2 py-1 hover:bg-[#316AC5] hover:text-white cursor-pointer rounded-sm">
+                Pathology
+                <div class="dropdown-menu absolute left-0 top-[100%] xp-dropdown min-w-[150px] text-black py-0.5 mt-[1px]">
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-pathology-lab-test')">Lab Test</div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-pathology-category')">Category</div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-pathology-reports')">Reports</div>
+                </div>
+            </div>
+
+            <div class="dropdown-parent relative px-2 py-1 hover:bg-[#316AC5] hover:text-white cursor-pointer rounded-sm">
+                Pathologist
+                <div class="dropdown-menu absolute left-0 top-[100%] xp-dropdown min-w-[180px] text-black py-0.5 mt-[1px]">
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-pathologist-dashboard')">Dashboard</div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-pathologist-pending')">Pending Reports</div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-pathologist-editor')">Report Editor</div>
+                    <div class="px-4 py-1 xp-menu-item" onclick="switchView('view-pathologist-reports')">Final Reports</div>
+                </div>
+            </div>
+
+            <div class="dropdown-parent relative px-2 py-1 hover:bg-[#316AC5] hover:text-white cursor-pointer rounded-sm">
+                Referral Manager
+                <div class="dropdown-menu absolute left-0 top-[100%] xp-dropdown min-w-[180px] text-black py-0.5 mt-[1px]">
+                    <div class="px-4 py-1 xp-menu-item">Referral List</div>
+                    <div class="px-4 py-1 xp-menu-item">Withdrawals & Rewards</div>
+                    <div class="px-4 py-1 xp-menu-item">Statement</div>
+                    <div class="px-4 py-1 xp-menu-item">Commission Report</div>
+                    <div class="px-4 py-1 xp-menu-item">Summary</div>
+                    <div class="px-4 py-1 xp-menu-item">Payout Report</div>
+                </div>
+            </div>
+
+            <div class="dropdown-parent relative px-2 py-1 hover:bg-[#316AC5] hover:text-white cursor-pointer rounded-sm">
+                Billing
+                <div class="dropdown-menu absolute left-0 top-[100%] xp-dropdown min-w-[150px] text-black py-0.5 mt-[1px]">
+                    <div class="px-4 py-1 xp-menu-item">Create Test Bill</div>
+                    <div class="px-4 py-1 xp-menu-item">Bill List</div>
+                    <div class="h-px bg-[#ACA899] mx-1 my-0.5 border-b border-white"></div>
+                    <div class="px-4 py-1 xp-menu-item">Due Report</div>
+                    <div class="px-4 py-1 xp-menu-item">Paid Report</div>
+                    <div class="px-4 py-1 xp-menu-item">To Collect Report</div>
+                </div>
+            </div>
+            
+            <div class="px-2 py-1 hover:bg-[#316AC5] hover:text-white cursor-pointer rounded-sm ml-auto">Help</div>
+        </div>
+
+        <!-- Explorer-style Toolbar -->
+        <div class="xp-toolbar flex items-center px-2 py-1.5 gap-4 shrink-0 bg-[#ECE9D8]">
+            <div class="flex items-center gap-1">
+                <span class="text-gray-600 font-bold ml-1 mr-1">Search:</span>
+                <input type="text" placeholder="Patient ID, Name..." class="xp-input w-64 px-1 py-0.5 focus:outline-none focus:bg-[#FFFFCC]">
+                <button class="xp-btn px-3 py-0.5 ml-1 flex items-center gap-1 focus:outline-none">
+                    <span class="text-[10px]">🔎</span> Go
+                </button>
+            </div>
+            
+            <div class="w-px h-5 bg-[#ACA899] border-r border-white"></div>
+            
+            <button class="xp-btn px-3 py-0.5 flex items-center gap-1 focus:outline-none">
+                <span class="text-yellow-600 font-bold text-[10px]">📈</span> Investment Report
+            </button>
+            
+            <button class="xp-btn px-3 py-0.5 flex items-center gap-1 focus:outline-none">
+                <span class="text-gray-600 text-[10px]">⚙️</span> Settings
+            </button>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-grow overflow-auto p-3 relative z-0 bg-white border-t border-[#ACA899]">
+            
+            <!-- Dashboard Content -->
+            <div id="view-dashboard" class="max-w-7xl mx-auto block">
+                
+                <!-- Page Title -->
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">System Dashboard</h1>
+                    <span class="text-gray-600">Data Date: <span class="font-bold text-black">14-APR-2026</span></span>
+                </div>
+
+                <!-- Key Metrics Cards (Styled as Windows GroupBoxes) -->
+                <div class="grid grid-cols-4 gap-3 mb-4">
+                    <fieldset class="xp-fieldset p-2 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Today's Patients</legend>
+                        <div class="text-2xl font-bold font-mono pl-1 text-black">142</div>
+                        <div class="text-[10px] text-[#0033CC] pl-1 mt-1">+12 from yesterday</div>
+                    </fieldset>
+
+                    <fieldset class="xp-fieldset p-2 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Total Appointments</legend>
+                        <div class="text-2xl font-bold font-mono pl-1 text-black">87</div>
+                        <div class="text-[10px] text-gray-600 pl-1 mt-1">Pending: 14</div>
+                    </fieldset>
+
+                    <fieldset class="xp-fieldset p-2 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Pending Lab Results</legend>
+                        <div class="text-2xl font-bold font-mono pl-1 text-[#CC0000]">45</div>
+                        <div class="text-[10px] text-[#CC0000] pl-1 mt-1 font-bold">Require immediate action</div>
+                    </fieldset>
+
+                    <fieldset class="xp-fieldset p-2 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Daily Collection (Est)</legend>
+                        <div class="text-2xl font-bold font-mono pl-1 text-[#006600]">$4,250.00</div>
+                        <div class="text-[10px] text-gray-600 pl-1 mt-1">To collect: $480.00</div>
+                    </fieldset>
+                </div>
+
+                <!-- Two Column Tables -->
+                <div class="grid grid-cols-2 gap-4">
+                    
+                    <!-- Left Column -->
+                    <fieldset class="xp-fieldset p-2 pb-3">
+                        <legend class="xp-legend px-1 font-bold">Recent Appointments</legend>
+                        
+                        <div class="mb-2 flex justify-between items-center">
+                            <button class="xp-btn px-4 py-0.5 focus:outline-none">Refresh List</button>
+                            <a href="#" class="text-[#0033CC] hover:underline">View All Appointments &raquo;</a>
+                        </div>
+
+                        <div class="border border-[#ACA899] bg-white">
+                            <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                                <thead>
+                                    <tr>
+                                        <th class="xp-th px-2 py-1 font-normal">Appt ID</th>
+                                        <th class="xp-th px-2 py-1 font-normal">Time</th>
+                                        <th class="xp-th px-2 py-1 font-normal">Patient Name</th>
+                                        <th class="xp-th px-2 py-1 font-normal">Doctor</th>
+                                        <th class="xp-th px-2 py-1 font-normal text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#0033CC] underline">APT-992</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">09:30 AM</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Smith, John</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Dr. Adams</td>
+                                        <td class="px-2 py-1 text-center"><span class="text-[#006600] font-bold">Waiting</span></td>
+                                    </tr>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#0033CC] underline">APT-993</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">09:45 AM</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Doe, Jane</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Dr. Adams</td>
+                                        <td class="px-2 py-1 text-center"><span class="text-[#0033CC] font-bold">In Consult</span></td>
+                                    </tr>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#0033CC] underline">APT-994</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">10:00 AM</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Williams, Robert</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Dr. Carter</td>
+                                        <td class="px-2 py-1 text-center"><span class="text-gray-600 font-bold">Booked</span></td>
+                                    </tr>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#0033CC] underline">APT-995</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">10:15 AM</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Brown, Emily</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Dr. Carter</td>
+                                        <td class="px-2 py-1 text-center"><span class="text-gray-600 font-bold">Booked</span></td>
+                                    </tr>
+                                    <tr class="xp-tr-hover">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#0033CC] underline">APT-996</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">10:30 AM</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Davis, Michael</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Dr. Adams</td>
+                                        <td class="px-2 py-1 text-center"><span class="text-gray-600 font-bold">Booked</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+
+                    <!-- Right Column -->
+                    <fieldset class="xp-fieldset p-2 pb-3">
+                        <legend class="xp-legend px-1 font-bold">Pending Lab Requests</legend>
+                        
+                        <div class="mb-2 flex justify-between items-center">
+                            <button class="xp-btn px-4 py-0.5 focus:outline-none">Process Batch</button>
+                            <a href="#" class="text-[#0033CC] hover:underline">Pathology Reports &raquo;</a>
+                        </div>
+
+                        <div class="border border-[#ACA899] bg-white">
+                            <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                                <thead>
+                                    <tr>
+                                        <th class="xp-th px-2 py-1 font-normal">Req ID</th>
+                                        <th class="xp-th px-2 py-1 font-normal">Patient</th>
+                                        <th class="xp-th px-2 py-1 font-normal">Tests Requested</th>
+                                        <th class="xp-th px-2 py-1 font-normal text-center">Priority</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">REQ-8012</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Clark, S.</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">CBC, KFT, LFT</td>
+                                        <td class="px-2 py-1 text-center"><span class="text-white bg-[#CC0000] px-1 pb-[1px] font-bold border border-[#880000]">URGENT</span></td>
+                                    </tr>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">REQ-8013</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Miller, T.</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Lipid Profile</td>
+                                        <td class="px-2 py-1 text-center"><span class="text-gray-700">Routine</span></td>
+                                    </tr>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">REQ-8014</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Wilson, A.</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">HbA1c, Fasting Sugar</td>
+                                        <td class="px-2 py-1 text-center"><span class="text-gray-700">Routine</span></td>
+                                    </tr>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">REQ-8015</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Moore, P.</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Thyroid Profile</td>
+                                        <td class="px-2 py-1 text-center"><span class="text-gray-700">Routine</span></td>
+                                    </tr>
+                                    <tr class="xp-tr-hover">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">REQ-8016</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Taylor, R.</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Urine Routine</td>
+                                        <td class="px-2 py-1 text-center"><span class="text-gray-700">Routine</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+
+                </div>
+            </div>
+
+            <!-- VIEW: Create Patient -->
+            <div id="view-create-patient" class="max-w-4xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Create Patient</h1>
+                    <button class="xp-btn px-4 py-1 font-bold focus:outline-none">Save Patient</button>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Basic Details -->
+                    <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Basic Details</legend>
+                        <div class="grid grid-cols-4 gap-3">
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Name <span class="text-red-600">*</span></label>
+                                <input type="text" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Gender</label>
+                                <select class="xp-input px-1 py-0.5"><option>Select</option><option>Male</option><option>Female</option></select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Birthday</label>
+                                <input type="date" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Age <span class="text-red-600">*</span></label>
+                                <input type="number" class="xp-input px-1 py-0.5">
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Marital Status</label>
+                                <select class="xp-input px-1 py-0.5"><option>Select</option><option>Single</option><option>Married</option></select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Mobile No <span class="text-red-600">*</span></label>
+                                <input type="text" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Email <span class="text-red-600">*</span></label>
+                                <input type="email" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Category <span class="text-red-600">*</span></label>
+                                <select class="xp-input px-1 py-0.5"><option>Select</option><option>General</option><option>VIP</option></select>
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Blood Group</label>
+                                <select class="xp-input px-1 py-0.5"><option>Select</option><option>O+</option><option>A+</option><option>B+</option></select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Blood Pressure</label>
+                                <input type="text" class="xp-input px-1 py-0.5" placeholder="e.g. 120/80">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Height</label>
+                                <input type="text" class="xp-input px-1 py-0.5" placeholder="cm">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Weight</label>
+                                <input type="text" class="xp-input px-1 py-0.5" placeholder="kg">
+                            </div>
+                            
+                            <div class="flex flex-col gap-1 col-span-2">
+                                <label class="font-bold">Address</label>
+                                <textarea class="xp-input px-1 py-0.5 h-16 resize-none"></textarea>
+                            </div>
+                            
+                            <div class="flex flex-col gap-1 col-span-2">
+                                <label class="font-bold">Profile Picture</label>
+                                <div class="border-2 border-dashed border-[#ACA899] bg-white h-16 flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-50">
+                                    <span>Drag and drop a file here or click</span>
+                                    <span class="text-[9px]">No file chosen</span>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Emergency Contact -->
+                    <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Emergency Contact</legend>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Guardian</label>
+                                <input type="text" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Relationship</label>
+                                <input type="text" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Mobile No</label>
+                                <input type="text" class="xp-input px-1 py-0.5">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Login Details -->
+                    <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Login Details</legend>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Username <span class="text-red-600">*</span></label>
+                                <input type="text" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Password <span class="text-red-600">*</span></label>
+                                <input type="password" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Retype Password <span class="text-red-600">*</span></label>
+                                <input type="password" class="xp-input px-1 py-0.5">
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <!-- VIEW: Patient List -->
+            <div id="view-patient-list" class="max-w-7xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Patient List</h1>
+                </div>
+                
+                <fieldset class="xp-fieldset p-2 pb-3 bg-[#ECE9D8]">
+                    <legend class="xp-legend px-1 font-bold">Manage Patients</legend>
+                    
+                    <div class="mb-3 flex gap-2">
+                        <button class="xp-btn px-4 py-1 focus:outline-none" onclick="switchView('view-create-patient')">➕ Add New</button>
+                        <button class="xp-btn px-4 py-1 text-[#006600] font-bold focus:outline-none">📥 Bulk Import</button>
+                        <button class="xp-btn px-4 py-1 text-[#0033CC] font-bold focus:outline-none">📤 Bulk Export</button>
+                        <div class="ml-auto flex items-center gap-1">
+                            <span class="font-bold">Search:</span>
+                            <input type="text" class="xp-input px-1 py-0.5 w-48">
+                        </div>
+                    </div>
+
+                    <div class="border border-[#ACA899] bg-white">
+                        <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                            <thead>
+                                <tr>
+                                    <th class="xp-th px-2 py-1 font-normal w-8"><input type="checkbox"></th>
+                                    <th class="xp-th px-2 py-1 font-normal">Patient ID</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Name</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Age/Gender</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Mobile</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Category</th>
+                                    <th class="xp-th px-2 py-1 font-normal text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]"><input type="checkbox"></td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#0033CC] underline">PT-00104</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Doe, Jonathan</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">42Y / M</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">+1-555-0198</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">General</td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button>
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Delete</button>
+                                    </td>
+                                </tr>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]"><input type="checkbox"></td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#0033CC] underline">PT-00105</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Smith, Sarah</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">28Y / F</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">+1-555-0211</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#CC0000] font-bold">VIP</td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button>
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- VIEW: Category -->
+            <div id="view-category" class="max-w-5xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Patient Categories</h1>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="col-span-1">
+                        <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                            <legend class="xp-legend px-1 font-bold">Add Category</legend>
+                            <div class="flex flex-col gap-3">
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Category Name <span class="text-red-600">*</span></label>
+                                    <input type="text" class="xp-input px-1 py-0.5">
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Discount Percentage (%)</label>
+                                    <input type="number" class="xp-input px-1 py-0.5" value="0">
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Description</label>
+                                    <textarea class="xp-input px-1 py-0.5 h-16 resize-none"></textarea>
+                                </div>
+                                <button class="xp-btn py-1 font-bold mt-2 focus:outline-none">Save Category</button>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-span-2">
+                        <fieldset class="xp-fieldset p-2 bg-[#ECE9D8] h-[300px]">
+                            <legend class="xp-legend px-1 font-bold">Category List</legend>
+                            <div class="border border-[#ACA899] bg-white h-full overflow-auto">
+                                <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                                    <thead>
+                                        <tr>
+                                            <th class="xp-th px-2 py-1 font-normal">ID</th>
+                                            <th class="xp-th px-2 py-1 font-normal">Category Name</th>
+                                            <th class="xp-th px-2 py-1 font-normal">Discount</th>
+                                            <th class="xp-th px-2 py-1 font-normal text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">1</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">General</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">0%</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">2</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold text-[#CC0000]">VIP</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">10%</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">3</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold text-[#0033CC]">Staff</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">50%</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Create New Test -->
+            <div id="view-create-test" class="max-w-4xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Create New Test</h1>
+                    <button class="xp-btn px-4 py-1 font-bold focus:outline-none text-[#0033CC]">Save Master Test</button>
+                </div>
+
+                <div class="space-y-4">
+                    <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Test Master Configuration</legend>
+                        <div class="grid grid-cols-3 gap-x-4 gap-y-3">
+                            <div class="flex flex-col gap-1 col-span-2">
+                                <label class="font-bold">Test Name <span class="text-red-600">*</span></label>
+                                <input type="text" class="xp-input px-1 py-0.5" placeholder="e.g., Complete Blood Count">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Test Code / Short Name <span class="text-red-600">*</span></label>
+                                <input type="text" class="xp-input px-1 py-0.5" placeholder="e.g., CBC">
+                            </div>
+                            
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Category (Department) <span class="text-red-600">*</span></label>
+                                <select class="xp-input px-1 py-0.5">
+                                    <option>Select...</option>
+                                    <option>Hematology</option>
+                                    <option>Biochemistry</option>
+                                    <option>Microbiology</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Sample Type <span class="text-red-600">*</span></label>
+                                <select class="xp-input px-1 py-0.5">
+                                    <option>Select...</option>
+                                    <option>EDTA Blood</option>
+                                    <option>Serum</option>
+                                    <option>Urine</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Method</label>
+                                <input type="text" class="xp-input px-1 py-0.5" placeholder="e.g., Analyzer">
+                            </div>
+
+                            <div class="h-px bg-[#ACA899] col-span-3 my-1 border-b border-white"></div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Default Unit</label>
+                                <input type="text" class="xp-input px-1 py-0.5" placeholder="e.g., mg/dL">
+                            </div>
+                            <div class="flex flex-col gap-1 col-span-2">
+                                <label class="font-bold">Bio Reference Range</label>
+                                <input type="text" class="xp-input px-1 py-0.5" placeholder="e.g., 10.0 - 40.0">
+                            </div>
+
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Test Price (Base) <span class="text-red-600">*</span></label>
+                                <div class="flex items-center">
+                                    <span class="bg-white border-t border-l border-b border-[#ACA899] px-2 py-0.5 font-bold">$</span>
+                                    <input type="number" class="xp-input px-1 py-0.5 w-full !border-l-0" value="0.00" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <!-- VIEW: Tests List -->
+            <div id="view-tests-list" class="max-w-6xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Master Tests List</h1>
+                </div>
+                
+                <fieldset class="xp-fieldset p-2 pb-3 bg-[#ECE9D8]">
+                    <legend class="xp-legend px-1 font-bold">Manage Defined Tests</legend>
+                    
+                    <div class="mb-3 flex gap-2">
+                        <button class="xp-btn px-4 py-1 focus:outline-none" onclick="switchView('view-create-test')">➕ Create New</button>
+                        <div class="ml-auto flex items-center gap-1">
+                            <span class="font-bold">Search Tests:</span>
+                            <input type="text" class="xp-input px-1 py-0.5 w-48" placeholder="Name or Code...">
+                        </div>
+                    </div>
+
+                    <div class="border border-[#ACA899] bg-white h-[400px] overflow-auto">
+                        <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                            <thead class="sticky top-0 z-10 shadow-[0_1px_0_#ACA899]">
+                                <tr>
+                                    <th class="xp-th px-2 py-1 font-normal">Code</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Test Name</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Category</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Sample</th>
+                                    <th class="xp-th px-2 py-1 font-normal text-right">Price</th>
+                                    <th class="xp-th px-2 py-1 font-normal text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">CBC</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Complete Blood Count</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Hematology</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">EDTA Blood</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] text-right font-mono">$15.00</td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">KFT</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Kidney Function Test</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Biochemistry</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Serum</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] text-right font-mono">$25.00</td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">LFT</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Liver Function Test</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Biochemistry</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Serum</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] text-right font-mono">$30.00</td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- VIEW: Add Tests -->
+            <div id="view-add-tests" class="max-w-5xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Add Tests (Order Requisition)</h1>
+                    <button class="xp-btn px-4 py-1 font-bold focus:outline-none text-[#006600]">Proceed to Billing</button>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <!-- Patient Selection -->
+                    <div class="col-span-1">
+                        <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                            <legend class="xp-legend px-1 font-bold">Patient Details</legend>
+                            <div class="flex flex-col gap-3">
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Select Patient <span class="text-red-600">*</span></label>
+                                    <div class="flex gap-1">
+                                        <input type="text" class="xp-input px-1 py-0.5 flex-grow" placeholder="Search ID or Mobile...">
+                                        <button class="xp-btn px-2 focus:outline-none">🔍</button>
+                                    </div>
+                                    <div class="mt-2 p-2 border border-[#ACA899] bg-white h-24 text-[10px] text-gray-700">
+                                        <p><span class="font-bold text-black">PT-00104</span></p>
+                                        <p>Doe, Jonathan</p>
+                                        <p>42Y / M</p>
+                                        <p>+1-555-0198</p>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Referring Doctor</label>
+                                    <select class="xp-input px-1 py-0.5">
+                                        <option>Self</option>
+                                        <option>Dr. Adams</option>
+                                        <option>Dr. Carter</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+
+                    <!-- Test Selection & Cart -->
+                    <div class="col-span-2">
+                        <fieldset class="xp-fieldset p-3 bg-[#ECE9D8] h-full flex flex-col">
+                            <legend class="xp-legend px-1 font-bold">Assign Tests</legend>
+                            
+                            <div class="flex gap-2 mb-3 items-end">
+                                <div class="flex flex-col gap-1 flex-grow">
+                                    <label class="font-bold">Search Test to Add</label>
+                                    <select class="xp-input px-1 py-0.5">
+                                        <option>Select Test...</option>
+                                        <option>CBC - Complete Blood Count ($15.00)</option>
+                                        <option>KFT - Kidney Function Test ($25.00)</option>
+                                        <option>LFT - Liver Function Test ($30.00)</option>
+                                    </select>
+                                </div>
+                                <button class="xp-btn px-4 py-0.5 font-bold text-[#0033CC] h-[22px] focus:outline-none">Add to List</button>
+                            </div>
+
+                            <div class="border border-[#ACA899] bg-white flex-grow overflow-auto mb-2">
+                                <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                                    <thead class="sticky top-0 z-10 shadow-[0_1px_0_#ACA899]">
+                                        <tr>
+                                            <th class="xp-th px-2 py-1 font-normal w-8">#</th>
+                                            <th class="xp-th px-2 py-1 font-normal">Test Name</th>
+                                            <th class="xp-th px-2 py-1 font-normal text-right">Price</th>
+                                            <th class="xp-th px-2 py-1 font-normal text-center w-12">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">1</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Complete Blood Count (CBC)</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] text-right font-mono">15.00</td>
+                                            <td class="px-2 py-1 text-center">
+                                                <button class="xp-btn px-2 py-0 text-[10px] text-[#CC0000] focus:outline-none">X</button>
+                                            </td>
+                                        </tr>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">2</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Liver Function Test (LFT)</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] text-right font-mono">30.00</td>
+                                            <td class="px-2 py-1 text-center">
+                                                <button class="xp-btn px-2 py-0 text-[10px] text-[#CC0000] focus:outline-none">X</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Total Footer -->
+                            <div class="flex justify-end items-center gap-4 bg-[#FFFFCC] border border-[#ACA899] p-2">
+                                <span class="font-bold text-gray-700">Total Amount:</span>
+                                <span class="font-bold text-lg font-mono text-[#006600]">$45.00</span>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Employee List -->
+            <div id="view-employee-list" class="max-w-7xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Employee List</h1>
+                </div>
+                
+                <fieldset class="xp-fieldset p-2 pb-3 bg-[#ECE9D8]">
+                    <legend class="xp-legend px-1 font-bold">Manage Employees</legend>
+                    
+                    <div class="mb-3 flex gap-2">
+                        <button class="xp-btn px-4 py-1 focus:outline-none" onclick="switchView('view-create-employee')">➕ Add Employee</button>
+                        <div class="ml-auto flex items-center gap-1">
+                            <span class="font-bold">Search:</span>
+                            <input type="text" class="xp-input px-1 py-0.5 w-48" placeholder="Name, ID, Department...">
+                        </div>
+                    </div>
+
+                    <div class="border border-[#ACA899] bg-white h-[400px] overflow-auto">
+                        <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                            <thead class="sticky top-0 z-10 shadow-[0_1px_0_#ACA899]">
+                                <tr>
+                                    <th class="xp-th px-2 py-1 font-normal w-8"><input type="checkbox"></th>
+                                    <th class="xp-th px-2 py-1 font-normal">Emp ID</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Name</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Department</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Designation</th>
+                                    <th class="xp-th px-2 py-1 font-normal">Mobile</th>
+                                    <th class="xp-th px-2 py-1 font-normal text-center">Status</th>
+                                    <th class="xp-th px-2 py-1 font-normal text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]"><input type="checkbox"></td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#0033CC] underline">EMP-1001</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Williams, Dr. Robert</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Pathology</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Senior Pathologist</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">+1-555-8822</td>
+                                    <td class="px-2 py-1 text-center"><span class="text-[#006600] font-bold">Active</span></td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]"><input type="checkbox"></td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#0033CC] underline">EMP-1002</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Miller, Sarah</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Laboratory</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Lab Technician</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">+1-555-8833</td>
+                                    <td class="px-2 py-1 text-center"><span class="text-[#006600] font-bold">Active</span></td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]"><input type="checkbox"></td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] text-[#0033CC] underline">EMP-1003</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Johnson, Mark</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Reception</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Front Desk Exec</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">+1-555-8844</td>
+                                    <td class="px-2 py-1 text-center"><span class="text-[#CC0000] font-bold">On Leave</span></td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- VIEW: Create Employee -->
+            <div id="view-create-employee" class="max-w-5xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Create New Employee</h1>
+                    <button class="xp-btn px-4 py-1 font-bold focus:outline-none text-[#0033CC]">Save Employee Record</button>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Basic Details -->
+                    <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Basic Information</legend>
+                        <div class="grid grid-cols-4 gap-3">
+                            <div class="flex flex-col gap-1 col-span-2">
+                                <label class="font-bold">Full Name <span class="text-red-600">*</span></label>
+                                <input type="text" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Gender</label>
+                                <select class="xp-input px-1 py-0.5"><option>Select</option><option>Male</option><option>Female</option></select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Date of Birth</label>
+                                <input type="date" class="xp-input px-1 py-0.5">
+                            </div>
+                            
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Mobile No <span class="text-red-600">*</span></label>
+                                <input type="text" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Email <span class="text-red-600">*</span></label>
+                                <input type="email" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1 col-span-2">
+                                <label class="font-bold">Residential Address</label>
+                                <input type="text" class="xp-input px-1 py-0.5">
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Professional Details -->
+                    <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Employment Details</legend>
+                        <div class="grid grid-cols-4 gap-3">
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Department <span class="text-red-600">*</span></label>
+                                <select class="xp-input px-1 py-0.5">
+                                    <option>Select...</option>
+                                    <option>Pathology</option>
+                                    <option>Laboratory</option>
+                                    <option>Reception</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Designation <span class="text-red-600">*</span></label>
+                                <select class="xp-input px-1 py-0.5">
+                                    <option>Select...</option>
+                                    <option>Senior Pathologist</option>
+                                    <option>Lab Technician</option>
+                                    <option>Front Desk Exec</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Date of Joining</label>
+                                <input type="date" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Base Salary</label>
+                                <div class="flex items-center">
+                                    <span class="bg-white border-t border-l border-b border-[#ACA899] px-2 py-0.5 font-bold">$</span>
+                                    <input type="number" class="xp-input px-1 py-0.5 w-full !border-l-0" value="0.00" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <!-- Login Details -->
+                    <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">System Login Credentials</legend>
+                        <div class="grid grid-cols-4 gap-3">
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Role / Permissions</label>
+                                <select class="xp-input px-1 py-0.5">
+                                    <option>Standard Staff</option>
+                                    <option>Doctor</option>
+                                    <option>Administrator</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Username</label>
+                                <input type="text" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="font-bold">Password</label>
+                                <input type="password" class="xp-input px-1 py-0.5">
+                            </div>
+                            <div class="flex flex-col gap-1 items-start justify-end pb-1">
+                                <label class="flex items-center gap-1 font-bold text-[#006600]">
+                                    <input type="checkbox" checked> Active User
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <!-- VIEW: Department -->
+            <div id="view-department" class="max-w-5xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Manage Departments</h1>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="col-span-1">
+                        <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                            <legend class="xp-legend px-1 font-bold">Add Department</legend>
+                            <div class="flex flex-col gap-3">
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Department Name <span class="text-red-600">*</span></label>
+                                    <input type="text" class="xp-input px-1 py-0.5" placeholder="e.g. Hematology">
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Department Head</label>
+                                    <input type="text" class="xp-input px-1 py-0.5" placeholder="Search Employee...">
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Description</label>
+                                    <textarea class="xp-input px-1 py-0.5 h-16 resize-none"></textarea>
+                                </div>
+                                <button class="xp-btn py-1 font-bold mt-2 focus:outline-none text-[#0033CC]">Save Department</button>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-span-2">
+                        <fieldset class="xp-fieldset p-2 bg-[#ECE9D8] h-[350px]">
+                            <legend class="xp-legend px-1 font-bold">Department List</legend>
+                            <div class="border border-[#ACA899] bg-white h-full overflow-auto">
+                                <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                                    <thead class="sticky top-0 z-10 shadow-[0_1px_0_#ACA899]">
+                                        <tr>
+                                            <th class="xp-th px-2 py-1 font-normal w-12">ID</th>
+                                            <th class="xp-th px-2 py-1 font-normal">Department Name</th>
+                                            <th class="xp-th px-2 py-1 font-normal">Head of Dept</th>
+                                            <th class="xp-th px-2 py-1 font-normal text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">D01</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Pathology</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">Dr. Robert Williams</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">D02</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Laboratory</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] text-gray-500">Unassigned</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">D03</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Reception</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">Mark Johnson</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Designation -->
+            <div id="view-designation" class="max-w-5xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Manage Designations</h1>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="col-span-1">
+                        <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                            <legend class="xp-legend px-1 font-bold">Add Designation</legend>
+                            <div class="flex flex-col gap-3">
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Designation Title <span class="text-red-600">*</span></label>
+                                    <input type="text" class="xp-input px-1 py-0.5" placeholder="e.g. Lab Technician">
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Base Pay Level</label>
+                                    <div class="flex items-center">
+                                        <span class="bg-white border-t border-l border-b border-[#ACA899] px-2 py-0.5 font-bold">$</span>
+                                        <input type="number" class="xp-input px-1 py-0.5 w-full !border-l-0" value="0.00" step="100">
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Notes</label>
+                                    <textarea class="xp-input px-1 py-0.5 h-16 resize-none"></textarea>
+                                </div>
+                                <button class="xp-btn py-1 font-bold mt-2 focus:outline-none text-[#0033CC]">Save Designation</button>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-span-2">
+                        <fieldset class="xp-fieldset p-2 bg-[#ECE9D8] h-[350px]">
+                            <legend class="xp-legend px-1 font-bold">Designation List</legend>
+                            <div class="border border-[#ACA899] bg-white h-full overflow-auto">
+                                <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                                    <thead class="sticky top-0 z-10 shadow-[0_1px_0_#ACA899]">
+                                        <tr>
+                                            <th class="xp-th px-2 py-1 font-normal w-12">ID</th>
+                                            <th class="xp-th px-2 py-1 font-normal">Title</th>
+                                            <th class="xp-th px-2 py-1 font-normal text-right">Base Pay Level</th>
+                                            <th class="xp-th px-2 py-1 font-normal text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">DS-10</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Senior Pathologist</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] text-right font-mono">$12,000.00</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">DS-11</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Lab Technician</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] text-right font-mono">$4,500.00</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">DS-12</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Front Desk Exec</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] text-right font-mono">$3,200.00</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Pathology Lab Test -->
+            <div id="view-pathology-lab-test" class="max-w-6xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Pathology Lab Tests Configuration</h1>
+                    <button class="xp-btn px-4 py-1 font-bold focus:outline-none text-[#006600]">➕ Add Pathology Test</button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <fieldset class="xp-fieldset p-2 bg-[#ECE9D8] h-[400px] flex flex-col">
+                        <legend class="xp-legend px-1 font-bold">Select Pathology Test</legend>
+                        <div class="mb-2 flex gap-1">
+                            <input type="text" class="xp-input px-1 py-0.5 flex-grow" placeholder="Search tests...">
+                            <button class="xp-btn px-2 focus:outline-none">🔍</button>
+                        </div>
+                        <div class="border border-[#ACA899] bg-white flex-grow overflow-auto">
+                            <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                                <thead class="sticky top-0 z-10 shadow-[0_1px_0_#ACA899]">
+                                    <tr>
+                                        <th class="xp-th px-2 py-1 font-normal w-12">Code</th>
+                                        <th class="xp-th px-2 py-1 font-normal">Test Name</th>
+                                        <th class="xp-th px-2 py-1 font-normal text-center">Parameters</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0] bg-[#316AC5] text-white">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">CBC</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Complete Blood Count</td>
+                                        <td class="px-2 py-1 text-center">8</td>
+                                    </tr>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">LIPID</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Lipid Profile</td>
+                                        <td class="px-2 py-1 text-center">5</td>
+                                    </tr>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">URINE</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Urine Routine</td>
+                                        <td class="px-2 py-1 text-center">12</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="xp-fieldset p-2 bg-[#ECE9D8] h-[400px] flex flex-col">
+                        <legend class="xp-legend px-1 font-bold text-[#006600]">Parameters for: CBC</legend>
+                        <div class="mb-2 flex justify-end gap-2">
+                            <button class="xp-btn px-3 py-0.5 focus:outline-none">Add Parameter</button>
+                            <button class="xp-btn px-3 py-0.5 font-bold text-[#0033CC] focus:outline-none">Save Format</button>
+                        </div>
+                        <div class="border border-[#ACA899] bg-white flex-grow overflow-auto">
+                            <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                                <thead class="sticky top-0 z-10 shadow-[0_1px_0_#ACA899]">
+                                    <tr>
+                                        <th class="xp-th px-2 py-1 font-normal">Parameter Name</th>
+                                        <th class="xp-th px-2 py-1 font-normal">Unit</th>
+                                        <th class="xp-th px-2 py-1 font-normal">Ref. Range</th>
+                                        <th class="xp-th px-2 py-1 font-normal text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">Hemoglobin</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">g/dL</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">13.0 - 17.0</td>
+                                        <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none text-[#CC0000]">X</button></td>
+                                    </tr>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">RBC Count</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">mill/cumm</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">4.5 - 5.5</td>
+                                        <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none text-[#CC0000]">X</button></td>
+                                    </tr>
+                                    <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">WBC Count</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">cells/cumm</td>
+                                        <td class="px-2 py-1 border-r border-[#F0F0F0]">4000 - 11000</td>
+                                        <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none text-[#CC0000]">X</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <!-- VIEW: Pathology Category -->
+            <div id="view-pathology-category" class="max-w-5xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Pathology Categories</h1>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="col-span-1">
+                        <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                            <legend class="xp-legend px-1 font-bold">Add Pathology Section</legend>
+                            <div class="flex flex-col gap-3">
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Category Name <span class="text-red-600">*</span></label>
+                                    <input type="text" class="xp-input px-1 py-0.5" placeholder="e.g. Microbiology">
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">HOD / Doctor-in-Charge</label>
+                                    <select class="xp-input px-1 py-0.5">
+                                        <option>Select Doctor...</option>
+                                        <option>Dr. Robert Williams</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <label class="font-bold">Section Details</label>
+                                    <textarea class="xp-input px-1 py-0.5 h-16 resize-none"></textarea>
+                                </div>
+                                <button class="xp-btn py-1 font-bold mt-2 focus:outline-none text-[#0033CC]">Save Category</button>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="col-span-2">
+                        <fieldset class="xp-fieldset p-2 bg-[#ECE9D8] h-[350px]">
+                            <legend class="xp-legend px-1 font-bold">Pathology Category List</legend>
+                            <div class="border border-[#ACA899] bg-white h-full overflow-auto">
+                                <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                                    <thead class="sticky top-0 z-10 shadow-[0_1px_0_#ACA899]">
+                                        <tr>
+                                            <th class="xp-th px-2 py-1 font-normal w-12">Code</th>
+                                            <th class="xp-th px-2 py-1 font-normal">Category Name</th>
+                                            <th class="xp-th px-2 py-1 font-normal">Head of Dept</th>
+                                            <th class="xp-th px-2 py-1 font-normal text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">PATH-H</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Hematology</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">Dr. Robert Williams</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">PATH-B</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Biochemistry</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">Dr. Sarah Miller</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                        <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">PATH-M</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Microbiology</td>
+                                            <td class="px-2 py-1 border-r border-[#F0F0F0]">Dr. Adams</td>
+                                            <td class="px-2 py-1 text-center"><button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Edit</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: Pathology Reports -->
+            <div id="view-pathology-reports" class="max-w-7xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Pathology Lab Reports</h1>
+                </div>
+                
+                <!-- Filters Fieldset -->
+                <fieldset class="xp-fieldset p-2 pb-3 mb-3 bg-[#ECE9D8]">
+                    <legend class="xp-legend px-1 font-bold">Filter Reports</legend>
+                    <div class="flex items-end gap-4">
+                        <div class="flex flex-col gap-1">
+                            <label class="font-bold text-gray-700">From Date</label>
+                            <input type="date" class="xp-input px-1 py-0.5 w-32" value="2026-04-01">
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="font-bold text-gray-700">To Date</label>
+                            <input type="date" class="xp-input px-1 py-0.5 w-32" value="2026-04-14">
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="font-bold text-gray-700">Status</label>
+                            <select class="xp-input px-1 py-0.5 w-40">
+                                <option>All</option>
+                                <option>Pending Entry</option>
+                                <option>Results Entered</option>
+                                <option>Approved/Final</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label class="font-bold text-gray-700">Patient ID/Name</label>
+                            <input type="text" class="xp-input px-1 py-0.5 w-48" placeholder="Search...">
+                        </div>
+                        <button class="xp-btn px-4 py-1 font-bold focus:outline-none h-[22px] flex items-center justify-center">🔍 Filter</button>
+                    </div>
+                </fieldset>
+
+                <!-- Data Table -->
+                <fieldset class="xp-fieldset p-2 bg-[#ECE9D8] h-[400px]">
+                    <legend class="xp-legend px-1 font-bold">Worklist / Reports Queue</legend>
+                    <div class="border border-[#ACA899] bg-white h-full overflow-auto">
+                        <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                            <thead class="sticky top-0 z-10 shadow-[0_1px_0_#ACA899]">
+                                <tr>
+                                    <th class="xp-th px-2 py-1 font-bold">Sample ID</th>
+                                    <th class="xp-th px-2 py-1 font-bold">Date & Time</th>
+                                    <th class="xp-th px-2 py-1 font-bold">Patient Name</th>
+                                    <th class="xp-th px-2 py-1 font-bold">Test Name</th>
+                                    <th class="xp-th px-2 py-1 font-bold text-center">Status</th>
+                                    <th class="xp-th px-2 py-1 font-bold text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-mono text-[#0033CC] underline">SAM-8012A</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">14-Apr-26 10:15 AM</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Clark, S.</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Complete Blood Count</td>
+                                    <td class="px-2 py-1 text-center border-r border-[#F0F0F0]"><span class="text-[#CC0000] font-bold">Pending Entry</span></td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] font-bold text-[#0033CC] focus:outline-none">Enter Results</button>
+                                    </td>
+                                </tr>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0] bg-[#FFFFE0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-mono text-[#0033CC] underline">SAM-8011B</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">14-Apr-26 09:30 AM</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Miller, T.</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Lipid Profile</td>
+                                    <td class="px-2 py-1 text-center border-r border-[#F0F0F0]"><span class="text-[#CC6600] font-bold">Results Entered</span></td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">Verify/Approve</button>
+                                    </td>
+                                </tr>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-mono text-[#0033CC] underline">SAM-8009A</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">13-Apr-26 04:00 PM</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Doe, Jane</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Urine Routine</td>
+                                    <td class="px-2 py-1 text-center border-r border-[#F0F0F0]"><span class="text-[#006600] font-bold">Approved</span></td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-2 py-0 text-[10px] font-bold focus:outline-none">🖨️ Print</button>
+                                        <button class="xp-btn px-2 py-0 text-[10px] focus:outline-none">📄 PDF</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- VIEW: Pathologist Dashboard -->
+            <div id="view-pathologist-dashboard" class="max-w-7xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Pathologist Dashboard</h1>
+                </div>
+
+                <div class="grid grid-cols-4 gap-3 mb-4">
+                    <fieldset class="xp-fieldset p-2 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Pending Reports</legend>
+                        <div class="text-2xl font-bold font-mono pl-1 text-[#CC0000]">45</div>
+                    </fieldset>
+                    <fieldset class="xp-fieldset p-2 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Completed Reports</legend>
+                        <div class="text-2xl font-bold font-mono pl-1 text-[#006600]">120</div>
+                    </fieldset>
+                    <fieldset class="xp-fieldset p-2 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Urgent Cases</legend>
+                        <div class="text-2xl font-bold font-mono pl-1 text-[#CC6600]">8</div>
+                    </fieldset>
+                    <fieldset class="xp-fieldset p-2 bg-[#ECE9D8]">
+                        <legend class="xp-legend px-1 font-bold">Today's Workload</legend>
+                        <div class="text-2xl font-bold font-mono pl-1 text-[#0033CC]">60</div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <!-- VIEW: Pathologist Pending Reports -->
+            <div id="view-pathologist-pending" class="max-w-5xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Pending Reports</h1>
+                </div>
+
+                <fieldset class="xp-fieldset p-2 bg-[#ECE9D8] h-[400px]">
+                    <legend class="xp-legend px-1 font-bold">Reports Queue</legend>
+                    <div class="border border-[#ACA899] bg-white h-full overflow-auto">
+                        <table class="w-full text-left border-collapse whitespace-nowrap cursor-default">
+                            <thead class="sticky top-0 z-10 shadow-[0_1px_0_#ACA899]">
+                                <tr>
+                                    <th class="xp-th px-2 py-1 font-bold">ID</th>
+                                    <th class="xp-th px-2 py-1 font-bold">Patient</th>
+                                    <th class="xp-th px-2 py-1 font-bold">Tests</th>
+                                    <th class="xp-th px-2 py-1 font-bold text-center">Priority</th>
+                                    <th class="xp-th px-2 py-1 font-bold text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-mono text-[#0033CC] underline">REP-101</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">John Doe</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">CBC, Lipid</td>
+                                    <td class="px-2 py-1 text-center border-r border-[#F0F0F0]">
+                                        <span class="bg-[#CC0000] text-white px-2 py-0.5 rounded-sm font-bold shadow-sm">URGENT</span>
+                                    </td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-3 py-0.5 font-bold focus:outline-none" onclick="switchView('view-pathologist-editor')">Review</button>
+                                    </td>
+                                </tr>
+                                <tr class="xp-tr-hover border-b border-[#F0F0F0]">
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-mono text-[#0033CC] underline">REP-102</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0] font-bold">Jane Smith</td>
+                                    <td class="px-2 py-1 border-r border-[#F0F0F0]">Urine Routine</td>
+                                    <td class="px-2 py-1 text-center border-r border-[#F0F0F0]">
+                                        <span class="bg-[#E6E6E6] border border-[#ACA899] text-black px-2 py-0.5 rounded-sm">NORMAL</span>
+                                    </td>
+                                    <td class="px-2 py-1 text-center">
+                                        <button class="xp-btn px-3 py-0.5 font-bold focus:outline-none" onclick="switchView('view-pathologist-editor')">Review</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- VIEW: Pathologist Report Editor -->
+            <div id="view-pathologist-editor" class="max-w-5xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Report Review</h1>
+                    <button class="xp-btn px-4 py-1 font-bold focus:outline-none text-[#006600]" onclick="alert('Report Approved!'); switchView('view-pathologist-pending')">Approve Report</button>
+                </div>
+
+                <fieldset class="xp-fieldset p-3 bg-[#ECE9D8]">
+                    <legend class="xp-legend px-1 font-bold">Patient & Clinical Notes</legend>
+                    <div class="mb-3">
+                        <p class="mb-1"><span class="font-bold">Patient:</span> John Doe (REP-101)</p>
+                        <p class="mb-2"><span class="font-bold">Tests:</span> CBC, Lipid</p>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <label class="font-bold text-gray-700">Pathologist Comments / Notes</label>
+                        <textarea class="xp-input p-2 h-32 resize-none" placeholder="Enter findings or notes here..."></textarea>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- VIEW: Pathologist Final Reports -->
+            <div id="view-pathologist-reports" class="max-w-5xl mx-auto hidden">
+                <div class="flex justify-between items-end border-b border-[#ACA899] pb-1 mb-3">
+                    <h1 class="text-lg font-bold text-[#0033CC]">Final Reports</h1>
+                </div>
+
+                <fieldset class="xp-fieldset p-2 bg-[#ECE9D8] h-[400px]">
+                    <legend class="xp-legend px-1 font-bold">Approved Reports</legend>
+                    <div class="border border-[#ACA899] bg-white h-full overflow-auto">
+                        <ul class="p-2 space-y-2">
+                            <li class="border border-[#ACA899] p-2 bg-[#F9F9F9] flex justify-between items-center shadow-sm">
+                                <div>
+                                    <span class="font-bold">Sarah Connor</span> 
+                                    <span class="text-gray-500 mx-2">|</span> 
+                                    <span class="text-[#006600] font-bold">APPROVED</span>
+                                </div>
+                                <button class="xp-btn px-4 py-0.5 focus:outline-none text-[#0033CC] font-bold">🖨️ Print</button>
+                            </li>
+                            <li class="border border-[#ACA899] p-2 bg-[#F9F9F9] flex justify-between items-center shadow-sm">
+                                <div>
+                                    <span class="font-bold">Michael Scott</span> 
+                                    <span class="text-gray-500 mx-2">|</span> 
+                                    <span class="text-[#006600] font-bold">APPROVED</span>
+                                </div>
+                                <button class="xp-btn px-4 py-0.5 focus:outline-none text-[#0033CC] font-bold">🖨️ Print</button>
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+            </div>
+
+        </div>
+
+        <!-- Classic Windows Status Bar -->
+        <div class="xp-statusbar h-6 flex bg-[#ECE9D8] shrink-0 text-gray-700 px-0.5 pb-[1px] gap-0.5">
+            <div class="xp-status-pane px-2 flex items-center shrink-0 w-48">
+                <span class="mr-1">👤</span> User: Admin (Superuser)
+            </div>
+            <div class="xp-status-pane px-2 flex items-center shrink-0 w-48">
+                Branch: Main Hospital HQ
+            </div>
+            <div class="xp-status-pane px-2 flex items-center flex-grow">
+                <span class="text-green-600 mr-1 text-[10px]">●</span> Database: Connected (32ms)
+            </div>
+            <div class="xp-status-pane px-2 flex items-center shrink-0">
+                v4.2.0 build 8912
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function switchView(viewId) {
+            // Hide all views by resetting their utility classes
+            const views = [
+                'view-dashboard', 
+                'view-create-patient', 
+                'view-patient-list', 
+                'view-category',
+                'view-create-test',
+                'view-tests-list',
+                'view-add-tests',
+                'view-employee-list',
+                'view-create-employee',
+                'view-department',
+                'view-designation',
+                'view-pathology-lab-test',
+                'view-pathology-category',
+                'view-pathology-reports',
+                'view-pathologist-dashboard',
+                'view-pathologist-pending',
+                'view-pathologist-editor',
+                'view-pathologist-reports'
+            ];
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('block');
+                }
+            });
+            
+            // Show the target view
+            const targetView = document.getElementById(viewId);
+            if(targetView) {
+                targetView.classList.remove('hidden');
+                targetView.classList.add('block');
+            }
+        }
+    </script>
+</body>
+</html>
